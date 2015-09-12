@@ -114,7 +114,6 @@ class PackagesController extends Controller {
 	public function destroy($id)
 	{
 		dd('ok: ' . $id . ' deletou.');
-		
 	}
 
 	public function import(Request $request)
