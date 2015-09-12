@@ -34,12 +34,12 @@
     @if(@isset($package))
         <script>
             $(document).ready(function() {
-                $('#package_id').val('{{$package->package_id}}');
-                $('#source').val('{{$package->source}}');
-                $('#destination').val('{{$package->destination}}');
-                $('#port').val('{{$package->port}}');
-                $('#protocol').val('{{$package->protocol}}');
-                $('#data').val('{{$package->data}}');
+                $('#package_id').val('{{trim($package->package_id)}}');
+                $('#source').val('{{trim($package->source)}}');
+                $('#destination').val('{{trim($package->destination)}}');
+                $('#port').val('{{trim($package->port)}}');
+                $('#protocol').val('{{trim($package->protocol)}}');
+                $('#data').val('{{trim($package->data)}}');
             });
         </script>
     @endif
@@ -70,7 +70,7 @@
             $('#data').mask('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', {
                 translation: {
                     'A': {
-                        pattern: /[a-zA-Z]/, optional: true
+                        pattern: /[\w\W\s]/, optional: true
                     }
                 }
             });

@@ -107,7 +107,7 @@ class PackagesController extends Controller {
 
 			if ($validation->fails())
 			{
-				return redirect('packages/create')
+				return redirect('packages/'.$id.'/edit')
 					->withErrors($validation->messages()->all())
 					->withInput();
 			}
@@ -117,13 +117,13 @@ class PackagesController extends Controller {
 
 				if (! $data->save())
 				{
-					return redirect('packages/create')
+					return redirect('packages/edit')
 						->withErrors('Could not update the package')
 						->withInput();
 				}
 			}
 
-			return view('packages.index');
+			return redirect('packages');
 		}
 		catch(\Exception $e)
 		{
