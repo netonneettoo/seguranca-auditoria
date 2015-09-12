@@ -1,5 +1,4 @@
 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-
 <div class="form-group">
     <label for="package_id">Id</label>
     <input class="form-control" type="number" step="1" min="1" max="9999" id="package_id" name="package_id" required autofocus="autofocus"/>
@@ -67,8 +66,6 @@
             });
 
             $('#port').mask('9999');
-
-            $('#package_id').mask('9999');
 
             $('#data').mask('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', {
                 translation: {

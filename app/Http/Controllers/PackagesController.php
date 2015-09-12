@@ -47,7 +47,9 @@ class PackagesController extends Controller {
 
 			if ($validation->fails())
 			{
-				throw new \Exception($validation->messages()->all(), 500);
+				return redirect('packages/create')
+					->withErrors($validation->messages()->all())
+					->withInput();
 			}
 
 			$data = $this->model->store($request->all());
@@ -63,10 +65,7 @@ class PackagesController extends Controller {
 		}
 		catch(\Exception $e)
 		{
-			/*return redirect('packages.store')
-				->withErrors($e->getMessage())
-				->withInput();*/
-			return $e->getMessage();
+			dd($e->getMessage());
 		}
 	}
 
@@ -100,9 +99,36 @@ class PackagesController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($id)
+	public function update(Request $request, $id)
 	{
-		//
+		try
+		{
+			$validation = $this->model->validatePut($request->all());
+
+			if ($validation->fails())
+			{
+				return redirect('packages/create')
+					->withErrors($validation->messages()->all())
+					->withInput();
+			}
+			else
+			{
+				$data = $this->model->put($request->all(), $id);
+
+				if (! $data->save())
+				{
+					return redirect('packages/create')
+						->withErrors('Could not update the package')
+						->withInput();
+				}
+			}
+
+			return view('packages.index');
+		}
+		catch(\Exception $e)
+		{
+			return $e->getMessage();
+		}
 	}
 
 	/**
@@ -113,7 +139,28 @@ class PackagesController extends Controller {
 	 */
 	public function destroy($id)
 	{
-		dd('ok: ' . $id . ' deletou.');
+		try
+		{
+			if (intval($id) > 0)
+			{
+				$data = Package::find($id);
+
+				if ($data != null)
+				{
+					$data->delete();
+
+					return redirect('packages');
+				}
+			}
+
+			return redirect('packages/create')
+				->withErrors('Could not delete the package:' . $id)
+				->withInput();
+		}
+		catch(\Exception $e)
+		{
+			dd($e->getMessage());
+		}
 	}
 
 	public function import(Request $request)

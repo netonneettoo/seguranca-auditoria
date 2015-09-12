@@ -17,9 +17,9 @@ Route::get('home', 'HomeController@index');
 
 Route::post('packages/import', 'PackagesController@import');
 Route::get('packages/export', 'PackagesController@export');
-Route::post('packages/{id}/destroy', 'PackagesController@destroy');
-Route::post('packages/{id}', 'PackagesController@update');
-Route::resource('packages', 'PackagesController', ['only' => ['index', 'create', 'store', 'show', 'edit']]);
+//Route::post('packages/{id}/destroy', 'PackagesController@destroy');
+//Route::post('packages/{id}', 'PackagesController@update');
+Route::resource('packages', 'PackagesController', ['only' => ['index', 'create', 'store', 'show', 'edit', 'destroy', 'update']]);
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',
