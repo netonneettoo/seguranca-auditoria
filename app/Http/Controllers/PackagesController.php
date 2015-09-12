@@ -1,6 +1,6 @@
 <?php namespace App\Http\Controllers;
 
-use App\Http\Requests;
+
 use App\Package;
 use Illuminate\Http\Request;
 
@@ -63,9 +63,10 @@ class PackagesController extends Controller {
 		}
 		catch(\Exception $e)
 		{
-			return redirect('packages.store')
+			/*return redirect('packages.store')
 				->withErrors($e->getMessage())
-				->withInput();
+				->withInput();*/
+			return $e->getMessage();
 		}
 	}
 

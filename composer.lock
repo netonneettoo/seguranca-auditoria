@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b410802ff6096a752605761f6d336e62",
+    "hash": "24c3946acc997e3f3eca7fc5c99585b2",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -1745,46 +1745,6 @@
                 "environment"
             ],
             "time": "2015-05-30 15:59:26"
-        },
-        {
-            "name": "wilgucki/csv",
-            "version": "v0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/wilgucki/csv.git",
-                "reference": "b57fad4a1ff3bfcc9586d6e9647b74258f9855d5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/wilgucki/csv/zipball/b57fad4a1ff3bfcc9586d6e9647b74258f9855d5",
-                "reference": "b57fad4a1ff3bfcc9586d6e9647b74258f9855d5",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Wilgucki\\Csv\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Maciej Wilgucki",
-                    "email": "mwilgucki+packagist@gmail.com"
-                }
-            ],
-            "description": "Package for writing and reading CSV files",
-            "keywords": [
-                "csv",
-                "laravel"
-            ],
-            "time": "2015-09-10 17:14:18"
         }
     ],
     "packages-dev": [

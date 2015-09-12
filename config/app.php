@@ -136,8 +136,6 @@ return [
 		'Illuminate\Validation\ValidationServiceProvider',
 		'Illuminate\View\ViewServiceProvider',
 
-		'Wilgucki\Csv\CsvServiceProvider',
-
 		/*
 		 * Application Service Providers...
 		 */
@@ -146,10 +144,6 @@ return [
 		'App\Providers\ConfigServiceProvider',
 		'App\Providers\EventServiceProvider',
 		'App\Providers\RouteServiceProvider',
-
-		'CsvReader' => 'Wilgucki\Csv\Facades\Reader',
-		'CsvWriter' => 'Wilgucki\Csv\Facades\Writer',
-
 	],
 
 	/*
