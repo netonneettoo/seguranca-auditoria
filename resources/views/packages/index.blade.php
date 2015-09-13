@@ -52,7 +52,7 @@
                                         <a href="/packages/{{$package->id}}/edit" class="btn btn-info" data-toggle="tooltip" data-placement="top" title="Edit">
                                             <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                         </a>
-                                        <form action="/packages/{{$package->id}}" method="POST" style="display:inline;">
+                                        <form id="form-delete-{{$package->id}}" action="/packages/{{$package->id}}" method="POST" style="display:inline;">
                                             <input type="hidden" name="_method" value="DELETE">
                                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                             <button class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Remove">
@@ -90,6 +90,15 @@
     <script>
         $(document).ready(function()
         {
+            $('form[id^=form-delete]').submit(function (evt) {
+                var x = confirm('Você tem certeza que vc deseja excluir este item?');
+                if (x == true) {
+                    alert('Excluído com sucesso!');
+                } else {
+                    evt.preventDefault();
+                }
+            });
+
             $('#form-import').submit(function(evt) {
                 evt.preventDefault();
                 $('#file-import').click();
