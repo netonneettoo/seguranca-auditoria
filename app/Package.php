@@ -52,12 +52,12 @@ class Package extends Model {
 	{
 		$obj = new Package();
 
-		$obj->package_id 	= str_pad($data['package_id'], 4, $this->blankSpace, STR_PAD_RIGHT);
-		$obj->source 		= str_pad($data['source'], 15, $this->blankSpace, STR_PAD_RIGHT);
-		$obj->destination 	= str_pad($data['destination'], 15, $this->blankSpace, STR_PAD_RIGHT);
-		$obj->port 			= str_pad($data['port'], 4, $this->blankSpace, STR_PAD_RIGHT);
-		$obj->protocol 		= str_pad($data['protocol'], 4, $this->blankSpace, STR_PAD_RIGHT);
-		$obj->data 			= str_pad($data['data'], 50, $this->blankSpace, STR_PAD_RIGHT);
+		$obj->package_id 	= str_pad(trim($data['package_id']), 4, $this->blankSpace, STR_PAD_RIGHT);
+		$obj->source 		= str_pad(trim($data['source']), 15, $this->blankSpace, STR_PAD_RIGHT);
+		$obj->destination 	= str_pad(trim($data['destination']), 15, $this->blankSpace, STR_PAD_RIGHT);
+		$obj->port 			= str_pad(trim($data['port']), 4, $this->blankSpace, STR_PAD_RIGHT);
+		$obj->protocol 		= str_pad(trim($data['protocol']), 4, $this->blankSpace, STR_PAD_RIGHT);
+		$obj->data 			= str_pad(trim($data['data']), 50, $this->blankSpace, STR_PAD_RIGHT);
 
 		return $obj;
 	}
@@ -70,22 +70,22 @@ class Package extends Model {
 			$obj = new Package();
 
 		if (@isset($data['package_id'])		&& $data['package_id'] 	!= null)
-			$obj->package_id 	= str_pad($data['package_id'], 4, $this->blankSpace, STR_PAD_RIGHT);
+			$obj->package_id 	= str_pad(trim($data['package_id']), 4, $this->blankSpace, STR_PAD_RIGHT);
 
 		if (@isset($data['source'])			&& $data['source'] 		!= null)
-			$obj->source 		= str_pad($data['source'], 15, $this->blankSpace, STR_PAD_RIGHT);
+			$obj->source 		= str_pad(trim($data['source']), 15, $this->blankSpace, STR_PAD_RIGHT);
 
 		if (@isset($data['destination'])	&& $data['destination'] != null)
-			$obj->destination 	= str_pad($data['destination'], 15, $this->blankSpace, STR_PAD_RIGHT);
+			$obj->destination 	= str_pad(trim($data['destination']), 15, $this->blankSpace, STR_PAD_RIGHT);
 
 		if (@isset($data['port']) 			&& $data['port'] 		!= null)
-			$obj->port 			= str_pad($data['port'], 4, $this->blankSpace, STR_PAD_RIGHT);
+			$obj->port 			= str_pad(trim($data['port']), 4, $this->blankSpace, STR_PAD_RIGHT);
 
 		if (@isset($data['protocol']) 		&& $data['protocol'] 	!= null)
-			$obj->protocol 		= str_pad($data['protocol'], 4, $this->blankSpace, STR_PAD_RIGHT);
+			$obj->protocol 		= str_pad(trim($data['protocol']), 4, $this->blankSpace, STR_PAD_RIGHT);
 
 		if (@isset($data['data']) 			&& $data['data'] 		!= null)
-			$obj->data 			= str_pad($data['data'], 50, $this->blankSpace, STR_PAD_RIGHT);
+			$obj->data 			= str_pad(trim($data['data']), 50, $this->blankSpace, STR_PAD_RIGHT);
 
 		return $obj;
 	}

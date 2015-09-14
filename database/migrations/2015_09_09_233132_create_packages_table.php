@@ -19,7 +19,7 @@ class CreatePackagesTable extends Migration {
 			$table->string('source', 15);
 			$table->string('destination', 15);
 			$table->string('port', 4);
-			$table->enum('protocol', array('tcp', 'udp', 'icmp'));
+			$table->string('protocol', 4);
 			$table->string('package_id', 4);
 			$table->string('data', 50);
 

@@ -186,11 +186,12 @@ class PackagesController extends Controller {
 					$package->package_id.$separator.
 					$package->source.$separator.
 					$package->destination.$separator.
-					str_pad($package->port, 4, ' ', STR_PAD_RIGHT).$separator.
-					str_pad($package->protocol, 4, ' ', STR_PAD_RIGHT).$separator.
+					$package->port.$separator.
+					$package->protocol.$separator.
 					$package->data;
 			}
-			fwrite($f, implode("\n", $return));
+			//dd(implode(PHP_EOL, $return)); //test
+			fwrite($f, implode(PHP_EOL, $return));
 			fclose($f);
 		}
 
