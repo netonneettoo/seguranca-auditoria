@@ -2,17 +2,6 @@
 
 @section('content')
 <div class="container">
-    <div class="row">
-        @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-    </div>
 	<div class="row">
 		<div class="col-md-12">
             <div class="panel panel-default">
@@ -67,14 +56,14 @@
 				</div>
                 <div class="panel-footer">
                     <div class="pull-right">
-                        <form id="form-import" style="display:inline;">
+                        {{--<form id="form-import" style="display:inline;">
                             <input id="token_import" type="hidden" name="_token" value="{{ csrf_token() }}">
                             <input id="file-import" type="file" name="file" accept="text/plain" style="display:none;" />
                             <button class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Import TXT">
                                 <span class="glyphicon glyphicon-import" aria-hidden="true"></span>
                             </button>
-                        </form>
-                        <a href="/packages/export" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Export TXT">
+                        </form>--}}
+                        <a href="/packages/export" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Export to TXT">
                             <span class="glyphicon glyphicon-export" aria-hidden="true"></span>
                         </a>
                     </div>
@@ -90,13 +79,45 @@
     <script>
         $(document).ready(function()
         {
-            $('form[id^=form-delete]').submit(function (evt) {
-                var x = confirm('Você tem certeza que vc deseja excluir este item?');
-                if (x == true) {
-                    alert('Excluído com sucesso!');
-                } else {
-                    evt.preventDefault();
-                }
+            var eventCancel = function(evt) {
+                evt.preventDefault();
+            };
+
+            $('form[id^=form-delete] button').click(function (evt) {
+                evt.preventDefault();
+                var parent = $(this).parent('form');
+                new PNotify({
+                    title: 'Deletion confirmation',
+                    text: 'Are you sure you want to delete this item?',
+                    styling: "bootstrap3",
+                    icon: 'glyphicon glyphicon-question-sign',
+                    hide: false,
+                    confirm: {
+                        confirm: true,
+                        buttons: [
+                        {
+                            text: 'Delete',
+                            addClass: 'btn-danger',
+                            click: function(notice) {
+                                PNotify.removeAll();
+                                parent.submit();
+                            }
+                        },
+                        {
+                            text: 'Cancel',
+                            click: function(notice) {
+                                PNotify.removeAll();
+                            }
+                        }]
+                    },
+                    buttons: {
+                        closer: false,
+                        sticker: false
+                    },
+                    history: {
+                        history: false
+                    }
+                });
             });
 
             $('#form-import').submit(function(evt) {
@@ -107,39 +128,6 @@
             $('#file-import').change(function(event) {
                 sendFile(event.target.files[0]);
             });
-
-            var sendFile = function(file)
-            {
-                var url = '/packages/import';
-                var formData = new FormData();
-                formData.append('_token', $('#token_import').val());
-                formData.append('file', file);
-
-                $.ajax({
-                    url: window.location.origin + url,
-                    type: 'POST',
-                    data: formData,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    xhr: function() {  // Custom XMLHttpRequest
-                        var myXhr = $.ajaxSettings.xhr();
-                        if (myXhr.upload) { // Avalia se tem suporte a propriedade upload
-                            myXhr.upload.addEventListener('progress', function (elem) {
-                                /* faz alguma coisa durante o progresso do upload */
-                                console.log(elem);
-                            }, false);
-                        }
-                        return myXhr;
-                    },
-                    success: function (data) {
-                        console.log(data);
-                    },
-                    error: function (data) {
-                        console.log(data);
-                    },
-                });
-            }
         });
     </script>
 @endsection

@@ -16,6 +16,8 @@
 	<!-- Optional theme -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
 
+	<link href="/plugins/pnotify/pnotify.custom.min.css" media="all" rel="stylesheet" type="text/css" />
+
 </head>
 <body>
 	<nav class="navbar navbar-default">
@@ -62,9 +64,24 @@
 
 	<script src="http://igorescobar.github.io/jQuery-Mask-Plugin/js/jquery.mask.min.js"></script>
 
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js"></script>
+
+	<script type="text/javascript" src="/plugins/pnotify/pnotify.custom.min.js"></script>
+
 	<script>
 		$(document).ready(function() {
 			$('[data-toggle="tooltip"]').tooltip();
+			/*new PNotify({
+			 title: 'Successfully deleted!',
+			 text: '',
+			 type: 'success',
+			 opacity: .8,
+			 styling: "bootstrap3",
+			 icon: true,
+			 animation: "slide",
+			 shadow: true,
+			 delay: 8000
+			 });*/
 		});
 	</script>
 

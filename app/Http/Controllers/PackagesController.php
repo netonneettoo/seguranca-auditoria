@@ -3,6 +3,8 @@
 
 use App\Package;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\File;
 
 class PackagesController extends Controller {
 
@@ -60,7 +62,7 @@ class PackagesController extends Controller {
 			}
 			else
 			{
-				return view('packages.index');
+				return redirect('packages');
 			}
 		}
 		catch(\Exception $e)
@@ -172,6 +174,26 @@ class PackagesController extends Controller {
 
 	public function export()
 	{
-		dd('success exporting');
+		$packages = Package::all();
+		$file = public_path('newfile.txt');
+		$f = fopen($file, 'w+');
+
+		if ($f) {
+			$separator = ',';
+			$return = [];
+			foreach($packages as $package) {
+				$return[] =
+					$package->package_id.$separator.
+					$package->source.$separator.
+					$package->destination.$separator.
+					str_pad($package->port, 4, ' ', STR_PAD_RIGHT).$separator.
+					str_pad($package->protocol, 4, ' ', STR_PAD_RIGHT).$separator.
+					$package->data;
+			}
+			fwrite($f, implode("\n", $return));
+			fclose($f);
+		}
+
+		return response()->download($file, 'export-'.date('d-m-Y-H-i-s').'.txt');
 	}
 }

@@ -52,10 +52,10 @@ class Package extends Model {
 	{
 		$obj = new Package();
 
-		$obj->package_id 	= str_pad($data['package_id'], 4, $this->blankSpace, STR_PAD_LEFT);
+		$obj->package_id 	= str_pad($data['package_id'], 4, $this->blankSpace, STR_PAD_RIGHT);
 		$obj->source 		= str_pad($data['source'], 15, $this->blankSpace, STR_PAD_RIGHT);
 		$obj->destination 	= str_pad($data['destination'], 15, $this->blankSpace, STR_PAD_RIGHT);
-		$obj->port 			= str_pad($data['port'], 4, $this->blankSpace, STR_PAD_LEFT);
+		$obj->port 			= str_pad($data['port'], 4, $this->blankSpace, STR_PAD_RIGHT);
 		$obj->protocol 		= str_pad($data['protocol'], 4, $this->blankSpace, STR_PAD_RIGHT);
 		$obj->data 			= str_pad($data['data'], 50, $this->blankSpace, STR_PAD_RIGHT);
 
@@ -70,7 +70,7 @@ class Package extends Model {
 			$obj = new Package();
 
 		if (@isset($data['package_id'])		&& $data['package_id'] 	!= null)
-			$obj->package_id 	= str_pad($data['package_id'], 4, $this->blankSpace, STR_PAD_LEFT);
+			$obj->package_id 	= str_pad($data['package_id'], 4, $this->blankSpace, STR_PAD_RIGHT);
 
 		if (@isset($data['source'])			&& $data['source'] 		!= null)
 			$obj->source 		= str_pad($data['source'], 15, $this->blankSpace, STR_PAD_RIGHT);
@@ -79,7 +79,7 @@ class Package extends Model {
 			$obj->destination 	= str_pad($data['destination'], 15, $this->blankSpace, STR_PAD_RIGHT);
 
 		if (@isset($data['port']) 			&& $data['port'] 		!= null)
-			$obj->port 			= str_pad($data['port'], 4, $this->blankSpace, STR_PAD_LEFT);
+			$obj->port 			= str_pad($data['port'], 4, $this->blankSpace, STR_PAD_RIGHT);
 
 		if (@isset($data['protocol']) 		&& $data['protocol'] 	!= null)
 			$obj->protocol 		= str_pad($data['protocol'], 4, $this->blankSpace, STR_PAD_RIGHT);
