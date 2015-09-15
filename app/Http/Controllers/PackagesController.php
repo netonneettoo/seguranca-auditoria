@@ -4,6 +4,7 @@
 use App\Package;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\File;
 
 class PackagesController extends Controller {
@@ -79,7 +80,7 @@ class PackagesController extends Controller {
 	 */
 	public function show($id)
 	{
-		$package = $this->model->find($id);
+		$package = $this->model->getFind($id);
 		return view('packages.show')->with(['package' => $package]);
 	}
 
@@ -91,7 +92,7 @@ class PackagesController extends Controller {
 	 */
 	public function edit($id)
 	{
-		$package = $this->model->find($id);
+		$package = $this->model->getFind($id);
 		return view('packages.edit')->with(['package' => $package]);
 	}
 
@@ -167,8 +168,6 @@ class PackagesController extends Controller {
 
 	public function import(Request $request)
 	{
-		//$reader = \CsvReader::open('/path/to/file.csv');
-
 		dd($request->file('file'));
 	}
 
@@ -183,12 +182,12 @@ class PackagesController extends Controller {
 			$return = [];
 			foreach($packages as $package) {
 				$return[] =
-					$package->package_id.$separator.
-					$package->source.$separator.
-					$package->destination.$separator.
-					$package->port.$separator.
-					$package->protocol.$separator.
-					$package->data;
+					Crypt::decrypt($package->package_id).$separator.
+					Crypt::decrypt($package->source).$separator.
+					Crypt::decrypt($package->destination).$separator.
+					Crypt::decrypt($package->port).$separator.
+					Crypt::decrypt($package->protocol).$separator.
+					Crypt::decrypt($package->data);
 			}
 			//dd(implode(PHP_EOL, $return)); //test
 			fwrite($f, implode(PHP_EOL, $return));

@@ -16,12 +16,12 @@ class CreatePackagesTable extends Migration {
 		{
 			$table->increments('id');
 
-			$table->string('source', 15);
-			$table->string('destination', 15);
-			$table->string('port', 4);
-			$table->string('protocol', 4);
-			$table->string('package_id', 4);
-			$table->string('data', 50);
+			$table->text('source');
+			$table->text('destination');
+			$table->text('port');
+			$table->text('protocol');
+			$table->text('package_id');
+			$table->text('data');
 
 			$table->timestamps();
 		});
