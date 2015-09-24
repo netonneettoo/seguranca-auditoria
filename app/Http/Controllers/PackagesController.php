@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class PackagesController extends Controller {
 
@@ -13,6 +14,7 @@ class PackagesController extends Controller {
 
 	public function __construct(Package $model)
 	{
+		$this->middleware('auth');
 		$this->model = $model;
 	}
 
@@ -168,13 +170,36 @@ class PackagesController extends Controller {
 
 	public function import(Request $request)
 	{
-		dd($request->file('file'));
+		$file = $request->file('file');
+		$regexFilename = '/pacote\d{10}.txt/';
+
+		if (preg_match($regexFilename, $file->getClientOriginalName())) {
+			//dd('success');
+		} else {
+			//dd("Nome do arquivo precisa obedecer ao padrão deste exemplo: 'pacote9999999999.txt'");
+		}
+
+		$lines = explode(PHP_EOL, File::get($file->getRealPath()));
+
+		$return = [];
+		foreach($lines as $line) {
+			$fields = explode(',', $line);
+			$newArray['package_id'] = $fields[0];
+			$newArray['source'] = $fields[1];
+			$newArray['destination'] = $fields[2];
+			$newArray['port'] = $fields[3];
+			$newArray['protocol'] = $fields[4];
+			$newArray['data'] = $fields[5];
+			$return[] = $newArray;
+		}
+
+		dd($return);
 	}
 
 	public function export()
 	{
 		$packages = Package::all();
-		$file = public_path('newfile.txt');
+		$file = public_path('file-export.txt');
 		$f = fopen($file, 'w+');
 
 		if ($f) {
@@ -194,6 +219,6 @@ class PackagesController extends Controller {
 			fclose($f);
 		}
 
-		return response()->download($file, 'export-'.date('d-m-Y-H-i-s').'.txt');
+		return response()->download($file, 'pacote2012207180.txt');
 	}
 }

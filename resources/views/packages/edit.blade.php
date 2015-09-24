@@ -15,7 +15,7 @@
 	</div>
 	<div class="row">
 		<div class="col-md-12">
-			<form action="/packages/{{$package->id}}" method="POST">
+			<form id="package-edit" action="/packages/{{$package->id}}" method="POST">
 				<div class="panel panel-default">
 					<div class="panel-heading">Packages</div>
 					<div class="panel-body">

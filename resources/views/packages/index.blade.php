@@ -56,13 +56,13 @@
 				</div>
                 <div class="panel-footer">
                     <div class="pull-right">
-                        {{--<form id="form-import" style="display:inline;">
+                        <form id="form-import" style="display:inline;">
                             <input id="token_import" type="hidden" name="_token" value="{{ csrf_token() }}">
                             <input id="file-import" type="file" name="file" accept="text/plain" style="display:none;" />
                             <button class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Import TXT">
                                 <span class="glyphicon glyphicon-import" aria-hidden="true"></span>
                             </button>
-                        </form>--}}
+                        </form>
                         <a href="/packages/export" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Export to TXT">
                             <span class="glyphicon glyphicon-export" aria-hidden="true"></span>
                         </a>
@@ -79,10 +79,6 @@
     <script>
         $(document).ready(function()
         {
-            var eventCancel = function(evt) {
-                evt.preventDefault();
-            };
-
             $('form[id^=form-delete] button').click(function (evt) {
                 evt.preventDefault();
                 var parent = $(this).parent('form');
@@ -119,6 +115,39 @@
                     }
                 });
             });
+
+            var sendFile = function(file)
+            {
+                var url = '/packages/import';
+                var formData = new FormData();
+                formData.append('_token', $('#token_import').val());
+                formData.append('file', file);
+
+                $.ajax({
+                    url: window.location.origin + url,
+                    type: 'POST',
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    xhr: function() {  // Custom XMLHttpRequest
+                        var myXhr = $.ajaxSettings.xhr();
+                        if (myXhr.upload) { // Avalia se tem suporte a propriedade upload
+                            myXhr.upload.addEventListener('progress', function (elem) {
+                                //* faz alguma coisa durante o progresso do upload
+                                console.log(elem);
+                            }, false);
+                        }
+                        return myXhr;
+                    },
+                    success: function (data) {
+                        console.log(data);
+                    },
+                    error: function (data) {
+                        console.log(data);
+                    },
+                });
+            }
 
             $('#form-import').submit(function(evt) {
                 evt.preventDefault();

@@ -6,17 +6,17 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Laravel</title>
 
-	<link href="/css/app.css" rel="stylesheet">
-
 	<!-- Fonts -->
 	<link href='//fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
 
 	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/plugins/bootstrap/css/bootstrap.min.css">
 	<!-- Optional theme -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="/plugins/bootstrap/css/bootstrap-theme.min.css">
 
 	<link href="/plugins/pnotify/pnotify.custom.min.css" media="all" rel="stylesheet" type="text/css" />
+
+	<link href="/css/app.css" rel="stylesheet">
 
 </head>
 <body>
@@ -58,13 +58,15 @@
 	@yield('content')
 
 	<!-- Scripts -->
-	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="/plugins/jquery/jquery.min.js"></script>
 	<!-- Latest compiled and minified JavaScript -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script src="/plugins/bootstrap/js/bootstrap.min.js"></script>
 
 	<script src="http://igorescobar.github.io/jQuery-Mask-Plugin/js/jquery.mask.min.js"></script>
 
-	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js"></script>
+	<script src="/plugins/jquery-validate/jquery.validate.min.js"></script>
+	<script src="/plugins/jquery-validate/localization/messages_pt_BR.min.js"></script>
+	<script src="/plugins/jquery-validate/additional-methods.min.js"></script>
 
 	<script type="text/javascript" src="/plugins/pnotify/pnotify.custom.min.js"></script>
 

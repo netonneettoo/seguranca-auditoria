@@ -15,7 +15,7 @@
 	</div>
 	<div class="row">
 		<div class="col-md-12">
-			<form action="/packages" method="POST">
+			<form id="package-create" action="/packages" method="POST">
 				<div class="panel panel-default">
 					<div class="panel-heading">Packages</div>
 					<div class="panel-body">
