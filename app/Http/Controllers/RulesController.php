@@ -169,9 +169,8 @@ class RulesController extends Controller {
 
     public function fieldValidation($fieldName, $fieldValue) {
         $fieldValidator = Rule::orderBy('priority', 'DESC')->get();
-        $return = [];
+        $arrayMessage = array();
         foreach($fieldValidator as $obj) {
-            $arrayMessage = array();
             switch ($fieldName) {
                 case 'package_id':
                     break;
@@ -189,9 +188,8 @@ class RulesController extends Controller {
                 default:
                     //O campo 'tal' não passou na validação da regra de nome 'tal' e id 'tal'
             }
-            $return[] = $arrayMessage;
         }
-        return $return;
+        return $arrayMessage;
     }
 
     public function import(Request $request)
