@@ -36,6 +36,7 @@
 				<ul class="nav navbar-nav">
 					<li><a href="/">Home</a></li>
 					<li><a href="/packages">Packages</a></li>
+					<li><a href="/rules">Rules</a></li>
 				</ul>
 
 				<ul class="nav navbar-nav navbar-right">
@@ -73,7 +74,8 @@
 	<script>
 		$(document).ready(function() {
 			$('[data-toggle="tooltip"]').tooltip();
-			/*new PNotify({
+
+            /*new PNotify({
 			 title: 'Successfully deleted!',
 			 text: '',
 			 type: 'success',
@@ -84,6 +86,15 @@
 			 shadow: true,
 			 delay: 8000
 			 });*/
+
+            $.validator.addMethod(
+                    "regex",
+                    function(value, element, regexp) {
+                        var re = new RegExp(regexp);
+                        return this.optional(element) || re.test(value);
+                    },
+                    "Please check your input."
+            );
 		});
 	</script>
 

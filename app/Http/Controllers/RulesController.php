@@ -34,7 +34,7 @@ class RulesController extends Controller {
 	 */
 	public function create()
 	{
-		//
+        return view('rules.create');
 	}
 
 	/**
@@ -42,9 +42,34 @@ class RulesController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store(Request $request)
 	{
-		//
+        try
+        {
+            $validation = $this->model->validate($request->all());
+
+            if ($validation->fails())
+            {
+                return redirect('rules/create')
+                    ->withErrors($validation->messages()->all())
+                    ->withInput();
+            }
+
+            $data = $this->model->store($request->all());
+
+            if (! $data->save())
+            {
+                throw new \Exception('Could not save', 500);
+            }
+            else
+            {
+                return redirect('rules');
+            }
+        }
+        catch(\Exception $e)
+        {
+            dd($e->getMessage());
+        }
 	}
 
 	/**
@@ -67,7 +92,8 @@ class RulesController extends Controller {
 	 */
 	public function edit($id)
 	{
-		//
+        $data = $this->model->getFind($id);
+        return view('rules.edit')->with(['rule' => $data]);
 	}
 
 	/**
@@ -76,9 +102,36 @@ class RulesController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($id)
+	public function update(Request $request, $id)
 	{
-		//
+        try
+        {
+            $validation = $this->model->validatePut($request->all());
+
+            if ($validation->fails())
+            {
+                return redirect('rules/'.$id.'/edit')
+                    ->withErrors($validation->messages()->all())
+                    ->withInput();
+            }
+            else
+            {
+                $data = $this->model->put($request->all(), $id);
+
+                if (! $data->save())
+                {
+                    return redirect('rules/edit')
+                        ->withErrors('Could not update the package')
+                        ->withInput();
+                }
+            }
+
+            return redirect('rules');
+        }
+        catch(\Exception $e)
+        {
+            return $e->getMessage();
+        }
 	}
 
 	/**
@@ -89,7 +142,28 @@ class RulesController extends Controller {
 	 */
 	public function destroy($id)
 	{
-		//
+        try
+        {
+            if (intval($id) > 0)
+            {
+                $data = $this->model->find($id);
+
+                if ($data != null)
+                {
+                    $data->delete();
+
+                    return redirect('rules');
+                }
+            }
+
+            return redirect('rules/create')
+                ->withErrors('Could not delete the rule:' . $id)
+                ->withInput();
+        }
+        catch(\Exception $e)
+        {
+            return $e->getMessage();
+        }
 	}
 
 }

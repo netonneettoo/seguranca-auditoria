@@ -19,30 +19,35 @@ class Rule extends Model {
     ];
 
     protected $rules = [
-        'priority'      => 'required|between:2,2',
-        'name'          => 'required|unique|between:20,20',
-        'source'        => 'required|between:15,15',
-        'destination'   => 'required|between:15,15',
-        'direction'     => 'required|in:IN,OUT',
-        'protocol'      => 'required|between:4,4',
-        'start_port'    => 'required|between:5,5',
-        'end_port'      => 'between:5,5',
-        'action'        => 'required|in:ALLOW,DENY',
-        'content'       => 'required',
+        'priority'      => 'required|between:1,2',
+        'name'          => 'required|unique:rules|between:1,20',
+        'source'        => 'required|between:1,15',
+        'destination'   => 'required|between:1,15',
+        'direction'     => 'required|in:in,out',
+        'protocol'      => 'required|between:1,4',
+        'start_port'    => 'required|between:1,5',
+        'end_port'      => 'between:1,5',
+        'action'        => 'required|in:allow,deny',
+        'content'       => 'required|between:1,30',
     ];
 
     protected $rulesPut = [
-        'priority'      => 'between:2,2',
-        'name'          => 'unique|between:20,20',
-        'source'        => 'between:15,15',
-        'destination'   => 'between:15,15',
-        'direction'     => 'in:IN,OUT',
-        'protocol'      => 'between:4,4',
-        'start_port'    => 'between:5,5',
-        'end_port'      => 'between:5,5',
-        'action'        => 'in:ALLOW,DENY',
-        //'content'       => ''
+        'priority'      => 'between:1,2',
+        'name'          => 'unique:rules|between:1,20',
+        'source'        => 'between:1,15',
+        'destination'   => 'between:1,15',
+        'direction'     => 'in:in,out',
+        'protocol'      => 'between:1,4',
+        'start_port'    => 'between:1,5',
+        'end_port'      => 'between:1,5',
+        'action'        => 'in:allow,deny',
+        //'content'       => 'between:1,30',
     ];
+
+    const DIRECTION_IN = 'in';
+    const DIRECTION_OUT = 'out';
+    const ACTION_ALLOW = 'allow';
+    const ACTION_DENY = 'deny';
 
     protected $messages = [];
 
@@ -50,28 +55,47 @@ class Rule extends Model {
 
     public function validate($data)
     {
+        $ipv4Regex = '/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/';
+        if (preg_match($ipv4Regex, $data['source']) == 0) {
+            if ($data['source'] == '*') {
+                $this->rules['source'] = 'between:1,15';
+            } else {
+                $this->rules['source'] = 'between:1,15|ip';
+            }
+        }
+        if (preg_match($ipv4Regex, $data['destination']) == 0) {
+            if ($data['destination'] == '*') {
+                $this->rules['destination'] = 'between:1,15';
+            } else {
+                $this->rules['destination'] = 'between:1,15|ip';
+            }
+        }
         return Validator::make($data, $this->rules, $this->messages);
     }
 
     public function validatePut($data)
     {
+        $ipv4Regex = '/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/';
+        if (preg_match($ipv4Regex, $data['source']) == 0) {
+            if ($data['source'] == '*') {
+                $this->rules['source'] = 'between:1,15';
+            } else {
+                $this->rules['source'] = 'between:1,15|ip';
+            }
+        }
+        if (preg_match($ipv4Regex, $data['destination']) == 0) {
+            if ($data['destination'] == '*') {
+                $this->rules['destination'] = 'between:1,15';
+            } else {
+                $this->rules['destination'] = 'between:1,15|ip';
+            }
+        }
         return Validator::make($data, $this->rulesPut, $this->messagesPut);
     }
 
     public function store($data)
     {
         $obj = new Rule();
-
-//        $obj->package_id 	= Crypt::encrypt(str_pad(trim($data['priority']), 2, $this->blankSpace, STR_PAD_RIGHT));
-//        $obj->source 		= Crypt::encrypt(str_pad(trim($data['name']), 15, $this->blankSpace, STR_PAD_RIGHT));
-//        $obj->destination 	= Crypt::encrypt(str_pad(trim($data['source']), 15, $this->blankSpace, STR_PAD_RIGHT));
-//        $obj->port 			= Crypt::encrypt(str_pad(trim($data['destination']), 4, $this->blankSpace, STR_PAD_RIGHT));
-//        $obj->protocol 		= Crypt::encrypt(str_pad(trim($data['direction']), 4, $this->blankSpace, STR_PAD_RIGHT));
-//        $obj->data 			= Crypt::encrypt(str_pad(trim($data['protocol']), 50, $this->blankSpace, STR_PAD_RIGHT));
-//        $obj->data 			= Crypt::encrypt(str_pad(trim($data['start_port']), 50, $this->blankSpace, STR_PAD_RIGHT));
-//        $obj->data 			= Crypt::encrypt(str_pad(trim($data['end_port']), 50, $this->blankSpace, STR_PAD_RIGHT));
-//        $obj->data 			= Crypt::encrypt(str_pad(trim($data['action']), 50, $this->blankSpace, STR_PAD_RIGHT));
-//        $obj->data 			= Crypt::encrypt(str_pad(trim($data['content']), 50, $this->blankSpace, STR_PAD_RIGHT));
 
         $obj->priority = $data['priority'];
         $obj->name = $data['name'];
@@ -93,24 +117,6 @@ class Rule extends Model {
 
         if ($obj == null)
             $obj = new Rule();
-
-//        if (@isset($data['package_id'])		&& $data['package_id'] 	!= null)
-//            $obj->package_id 	= Crypt::encrypt(str_pad(trim($data['package_id']), 4, $this->blankSpace, STR_PAD_RIGHT));
-//
-//        if (@isset($data['source'])			&& $data['source'] 		!= null)
-//            $obj->source 		= Crypt::encrypt(str_pad(trim($data['source']), 15, $this->blankSpace, STR_PAD_RIGHT));
-//
-//        if (@isset($data['destination'])	&& $data['destination'] != null)
-//            $obj->destination 	= Crypt::encrypt(str_pad(trim($data['destination']), 15, $this->blankSpace, STR_PAD_RIGHT));
-//
-//        if (@isset($data['port']) 			&& $data['port'] 		!= null)
-//            $obj->port 			= Crypt::encrypt(str_pad(trim($data['port']), 4, $this->blankSpace, STR_PAD_RIGHT));
-//
-//        if (@isset($data['protocol']) 		&& $data['protocol'] 	!= null)
-//            $obj->protocol 		= Crypt::encrypt(str_pad(trim($data['protocol']), 4, $this->blankSpace, STR_PAD_RIGHT));
-//
-//        if (@isset($data['data']) 			&& $data['data'] 		!= null)
-//            $obj->data 			= Crypt::encrypt(str_pad(trim($data['data']), 50, $this->blankSpace, STR_PAD_RIGHT));
 
         if (@isset($data['priority']) && $data['priority'] != null)
             $obj->priority = $data['priority'];
@@ -141,6 +147,7 @@ class Rule extends Model {
         $all = [];
         foreach($this->all() as $data) {
             $obj = new \stdClass();
+            $obj->id            = $data->id;
             $obj->priority      = $data->priority;
             $obj->name          = $data->name;
             $obj->source        = $data->source;
@@ -161,6 +168,7 @@ class Rule extends Model {
         $data = $this->find($id);
         if ($data != null) {
             $obj = new \stdClass();
+            $obj->id            = $data->id;
             $obj->priority      = $data->priority;
             $obj->name          = $data->name;
             $obj->source        = $data->source;

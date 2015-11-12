@@ -6,8 +6,8 @@
 		<div class="col-md-12">
             <div class="panel panel-default">
 				<div class="panel-heading">
-                    Packages
-                    <a href="/packages/create" class="btn btn-success pull-right" data-toggle="tooltip" data-placement="left" title="Add">
+                    Rules
+                    <a href="/rules/create" class="btn btn-success pull-right" data-toggle="tooltip" data-placement="left" title="Add">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                     </a>
                     <br style="clear:both;" />
@@ -16,32 +16,40 @@
 					<table class="table table-striped table-hover table-condensed">
                         <thead>
                             <tr>
-                                <th>Id</th>
+                                <th>Priority</th>
+                                <th>Name</th>
                                 <th>Source</th>
                                 <th>Destination</th>
-                                <th>Port</th>
+                                <th>Direction</th>
                                 <th>Protocol</th>
-                                <th>Data</th>
+                                <th>Start Port</th>
+                                <th>End Port</th>
+                                <th>Action</th>
+                                <th>Content</th>
                                 <th width="140px"></th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($packages as $package)
+                            @foreach($rules as $rule)
                                 <tr>
-                                    <td>{{$package->package_id}}</td>
-                                    <td>{{$package->source}}</td>
-                                    <td>{{$package->destination}}</td>
-                                    <td>{{$package->port}}</td>
-                                    <td>{{$package->protocol}}</td>
-                                    <td>{{$package->data}}</td>
+                                    <td>{{$rule->priority}}</td>
+                                    <td>{{$rule->name}}</td>
+                                    <td>{{$rule->source}}</td>
+                                    <td>{{$rule->destination}}</td>
+                                    <td>{{$rule->direction}}</td>
+                                    <td>{{$rule->protocol}}</td>
+                                    <td>{{$rule->start_port}}</td>
+                                    <td>{{$rule->end_port}}</td>
+                                    <td>{{$rule->action}}</td>
+                                    <td>{{$rule->content}}</td>
                                     <td>
-                                        <a href="/packages/{{$package->id}}" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Show">
+                                        <a href="/rules/{{$rule->id}}" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Show">
                                             <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
                                         </a>
-                                        <a href="/packages/{{$package->id}}/edit" class="btn btn-info" data-toggle="tooltip" data-placement="top" title="Edit">
+                                        <a href="/rules/{{$rule->id}}/edit" class="btn btn-info" data-toggle="tooltip" data-placement="top" title="Edit">
                                             <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                         </a>
-                                        <form id="form-delete-{{$package->id}}" action="/packages/{{$package->id}}" method="POST" style="display:inline;">
+                                        <form id="form-delete-{{$rule->id}}" action="/rules/{{$rule->id}}" method="POST" style="display:inline;">
                                             <input type="hidden" name="_method" value="DELETE">
                                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                             <button class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Remove">
@@ -63,9 +71,9 @@
                                 <span class="glyphicon glyphicon-import" aria-hidden="true"></span>
                             </button>
                         </form>
-                        <a href="/packages/export" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Export to TXT">
-                            <span class="glyphicon glyphicon-export" aria-hidden="true"></span>
-                        </a>
+                        {{--<a href="/packages/export" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Export to TXT">--}}
+                            {{--<span class="glyphicon glyphicon-export" aria-hidden="true"></span>--}}
+                        {{--</a>--}}
                     </div>
                     <br style="clear:both;" />
                 </div>
