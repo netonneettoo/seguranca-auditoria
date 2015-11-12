@@ -164,7 +164,7 @@ class PackagesController extends Controller {
 		}
 		catch(\Exception $e)
 		{
-			dd($e->getMessage());
+			return $e->getMessage();
 		}
 	}
 
@@ -200,9 +200,9 @@ class PackagesController extends Controller {
 	{
 		$packages = Package::all();
 		$file = public_path('file-export.txt');
-		$f = fopen($file, 'w+');
+		$fopen = fopen($file, 'w+');
 
-		if ($f) {
+		if ($fopen) {
 			$separator = ',';
 			$return = [];
 			foreach($packages as $package) {
@@ -214,9 +214,11 @@ class PackagesController extends Controller {
 					Crypt::decrypt($package->protocol).$separator.
 					Crypt::decrypt($package->data);
 			}
+            // adiciona EOF no final do arquivo
+            $return[] = 'EOF';
 			//dd(implode(PHP_EOL, $return)); //test
-			fwrite($f, implode(PHP_EOL, $return));
-			fclose($f);
+			fwrite($fopen, implode(PHP_EOL, $return));
+			fclose($fopen);
 		}
 
 		return response()->download($file, 'pacote2012207180.txt');

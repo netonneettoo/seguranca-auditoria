@@ -14,6 +14,12 @@ class DatabaseSeeder extends Seeder {
 	{
 		Model::unguard();
 
+		$user = new App\User();
+		$user->name = 'admin';
+		$user->email = 'admin@admin.com';
+		$user->password = bcrypt('default');
+		$user->save();
+
 		// $this->call('UserTableSeeder');
 	}
 
