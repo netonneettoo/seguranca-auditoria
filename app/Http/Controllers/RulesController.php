@@ -169,13 +169,12 @@ class RulesController extends Controller {
 
     public function fieldValidation($fieldName, $fieldValue) {
         $fieldValidator = Rule::orderBy('priority', 'DESC')->get();
-        $arrayMessage = array();
         foreach($fieldValidator as $obj) {
             switch ($fieldName) {
                 case 'package_id':
                     break;
                 case 'source':
-                    $arrayMessage[] = 'este campo nao passou pela validacao da regra: ' . $obj->id . '-' . $obj->name;
+                    return 'este campo nao passou pela validacao da regra: ' . $obj->id . '-' . $obj->name;
                     break;
                 case 'destination':
                     break;
@@ -189,7 +188,7 @@ class RulesController extends Controller {
                     //O campo 'tal' não passou na validação da regra de nome 'tal' e id 'tal'
             }
         }
-        return $arrayMessage;
+        return 'ok: ' . $fieldValue;
     }
 
     public function import(Request $request)
@@ -215,10 +214,10 @@ class RulesController extends Controller {
                 $newArray['errors'] = array();
 
                 $newArray['package_id'] = $fields[0];
-                $newArray['errors'][] = $this->fieldValidation('package_id', $newArray['package_id']);
+                //$newArray['errors'][] = $this->fieldValidation('package_id', $newArray['package_id']);
 
                 $newArray['source'] = $fields[1];
-                $newArray['errors'][] = $this->fieldValidation('source', $newArray['source']);
+                //$newArray['errors'][] = $this->fieldValidation('source', $newArray['source']);
 
                 $newArray['destination'] = $fields[2];
                 $newArray['port'] = $fields[3];
