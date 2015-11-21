@@ -3,6 +3,7 @@
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+use App\ImportedPackage;
 use App\Rule;
 use Illuminate\Http\Request;
 use League\Flysystem\File;
@@ -171,12 +172,12 @@ class RulesController extends Controller {
         $explode = explode(',', $line);
         if (count($explode) == 6) {
             $obj = new \stdClass();
-            $obj->packageId = intval($explode[0]);
+            $obj->package_id = intval($explode[0]);
             $obj->source = trim($explode[1]);
             $obj->destination = trim($explode[2]);
             $obj->port = intval($explode[3]);
             $obj->protocol = trim($explode[4]);
-            $obj->content = trim($explode[5]);
+            $obj->data = trim($explode[5]);
             return $obj;
         } else {
             return false;
@@ -201,7 +202,7 @@ class RulesController extends Controller {
         };
         return $arrayObj;
     }
-    
+
     private function validateIpRangeSource($ip, $min) {
         $ipLong = intval(str_replace('.', '', $ip));//ip2long($ip);
         $minLong = intval(str_replace('.', '', $min));//ip2long($min);
@@ -219,9 +220,9 @@ class RulesController extends Controller {
             return true;
         } else {
             if($end === '*') {
-                return $port >= $start;
+                return boolval($port >= $start);
             } else {
-                return (($port >= $start) && ($port <= $end));
+                return boolval(($port >= $start) && ($port <= $end));
             }
         }
     }
@@ -245,38 +246,40 @@ class RulesController extends Controller {
 
             if ($rule['direction'] == 'out') {
                 // retorna true, pois nao vai precisar validar o restante dos campos
-                $objReturn->messages[] = "PackageId: #{$obj->packageId}, RuleName: #{$rule['name']} - Regra de saída, sem necessidade de validar.";
+                $objReturn->messages[] = "PackageId: #{$obj->package_id}, RuleName: #{$rule['name']} - Regra de saída, sem necessidade de validar.";
                 $objReturn->fail = false;
             } else {
 
                 if(!($this->validateIpRangeSource($obj->source, $rule['source']))) {
                     // retorna false, pois a validacao deu erro
                     $objReturn->fail = true;
-                    $objReturn->messages[] = "PackageId: #{$obj->packageId}, RuleName: #{$rule['name']} - O ip de origem ({$obj->source}) está fora do range ({$rule['source']}, {$rule['destination']}).";
+                    $objReturn->messages[] = "PackageId: #{$obj->package_id}, RuleName: #{$rule['name']} - O ip de origem ({$obj->source}) está fora do range ({$rule['source']}, {$rule['destination']}).";
                 }
 
                 if(!($this->validateIpRangeDestination($obj->destination, $rule['destination']))) {
                     // retorna false, pois a validacao deu erro
                     $objReturn->fail = true;
-                    $objReturn->messages[] = "PackageId: #{$obj->packageId}, RuleName: #{$rule['name']} - O ip de destino ({$obj->destination}) está fora do range ({$rule['source']}, {$rule['destination']}).";
+                    $objReturn->messages[] = "PackageId: #{$obj->package_id}, RuleName: #{$rule['name']} - O ip de destino ({$obj->destination}) está fora do range ({$rule['source']}, {$rule['destination']}).";
                 }
 
                 if(!$this->validatePortRange($obj->port, $rule['start_port'], $rule['end_port'])) {
                     // retorna false pois a porta nao esta no range correto
                     $objReturn->fail = true;
-                    $objReturn->messages[] = "PackageId: #{$obj->packageId}, Rule: #{$rule['name']} - A porta ({$obj->port}) está fora do range ({$rule['start_port']}, {$rule['end_port']}).";
+                    $objReturn->messages[] = "PackageId: #{$obj->package_id}, Rule: #{$rule['name']} - A porta ({$obj->port}) está fora do range ({$rule['start_port']}, {$rule['end_port']}).";
                 }
 
                 if(!$this->validateProtocol($obj->protocol, $rule['protocol'])) {
                     // retorna false, pois o protocolo nao corresponde
                     $objReturn->fail = true;
-                    $objReturn->messages[] = "PackageId: #{$obj->packageId}, Rule: #{$rule['name']} - O protocolo ({$obj->port}) é inválido.";
+                    $objReturn->messages[] = "PackageId: #{$obj->package_id}, Rule: #{$rule['name']} - O protocolo ({$obj->port}) é inválido.";
                 }
 
                 if($rule['action'] == 'deny') {
-                    // retorna false, pois se chegar um pacote com essas caracteristicas precisa-se bloquear
-                    $objReturn->fail = true;
-                    $objReturn->messages[] = "#{$obj->packageId} [{$rule['name']} = action]" . '<br/>';
+                    if(!$objReturn->fail) {
+                        // retorna false, pois se chegar um pacote com essas caracteristicas precisa-se bloquear
+                        $objReturn->fail = true;
+                        $objReturn->messages[] = "#{$obj->package_id} [{$rule['name']} = action]" . '<br/>';
+                    }
                 }
             }
 
@@ -295,9 +298,28 @@ class RulesController extends Controller {
             foreach($arrayObj as $obj) {
                 $return[] = $this->validateObj($obj, $rules);
             }
+
+            //dd($return);
+
+            //test
+            \DB::beginTransaction();
+            foreach($return as $obj) {
+                if(!$obj->fail) { // se não tiver corrido erro
+                    $importedPackage = (new ImportedPackage())->fill((array)$obj->package);
+                    $importedPackage->save();
+                } else {
+                    \DB::rollBack();
+                }
+            }
+            \DB::commit();
+            //test
+
             return response()->json($return, 200);
+
         } catch (\Exception $e) {
-            return response()->json([$e->getMessage()], 500);
+            \DB::rollBack();
+            throw $e;
+            //return response()->json([$e->getMessage()], 500);
         }
     }
 

@@ -21,31 +21,8 @@ Route::controllers([
 	'password' => 'Auth\PasswordController',
 ]);
 
-Route::get('test/{hash}', function($hash) {
-    if ($hash == 'rules') {
+Route::get('/test', function() {
 
-//        $data = [
-//            'priority'      => 12,
-//            'name'          => 'required | unique | ',
-//            'source'        => '192.168.234.213',
-//            'destination'   => '123.210.90.119',
-//            'direction'     => \App\Rule::DIRECTION_IN,
-//            'protocol'      => 'icmp',
-//            'start_port'    => '1234',
-//            'end_port'      => '4321',
-//            'action'        => \App\Rule::ACTION_ALLOW,
-//            'content'       => 'Soube que me amava, entendi que eu ja nao podia re',
-//        ];
-//
-//        $obj = new \App\Rule();
-//        $obj = $obj->store($data);
-//        $obj->save();
+    return \App\ImportedPackage::all();
 
-
-        //$data = preg_match($regex, "123.123.123.123");
-
-        return '';
-    }
-
-    return abort(405, 'Method not allowed.');
 });
