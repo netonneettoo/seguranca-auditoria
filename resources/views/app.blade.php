@@ -38,6 +38,7 @@
 					<li><a href="/">Home</a></li>
 					<li><a href="/packages">Packages</a></li>
 					<li><a href="/rules">Rules</a></li>
+					<li><a href="/imported-packages">Imported Packages</a></li>
 				</ul>
 
 				<ul class="nav navbar-nav navbar-right">
