@@ -290,36 +290,47 @@ class RulesController extends Controller {
     public function import(Request $request)
     {
         try {
-            $arrayObj = $this->getArrayFromFile($request->file('file'));
-            $rules = Rule::orderBy('priority', 'ASC')->get()->toArray();
 
-            // é necessário que se faça uma transaçao do banco...
-            $return = array();
-            foreach($arrayObj as $obj) {
-                $return[] = $this->validateObj($obj, $rules);
-            }
+            $file = $_FILES['file'];
+            $regexFilename = '/pacote\d{10}.txt/';
 
-            //dd($return);
+            if (preg_match($regexFilename, $file['name'])) {
 
-            //test
-            \DB::beginTransaction();
-            foreach($return as $obj) {
-                if(!$obj->fail) { // se não tiver corrido erro
-                    $importedPackage = (new ImportedPackage())->fill((array)$obj->package);
-                    $importedPackage->save();
-                } else {
-                    \DB::rollBack();
+
+                $arrayObj = $this->getArrayFromFile($file['tmp_name']);
+                $rules = Rule::orderBy('priority', 'ASC')->get()->toArray();
+
+                // é necessário que se faça uma transaçao do banco...
+                $return = array();
+                foreach ($arrayObj as $obj) {
+                    $return[] = $this->validateObj($obj, $rules);
                 }
-            }
-            \DB::commit();
-            //test
 
-            return response()->json($return, 200);
+                //dd($return);
+
+                //test
+                \DB::beginTransaction();
+                foreach ($return as $obj) {
+                    if (!$obj->fail) { // se não tiver corrido erro
+                        $importedPackage = (new ImportedPackage())->fill((array)$obj->package);
+                        $importedPackage->save();
+                    } else {
+                        \DB::rollBack();
+                    }
+                }
+                \DB::commit();
+                //test
+
+                return response()->json($return, 200);
+
+            } else {
+                //dd("Nome do arquivo precisa obedecer ao padrão deste exemplo: 'pacote9999999999.txt'");
+                throw new \Exception('O nome do arquivo é inválido. Ex: pacote2012207180.txt', 500);
+            }
 
         } catch (\Exception $e) {
             \DB::rollBack();
-            throw $e;
-            //return response()->json([$e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 

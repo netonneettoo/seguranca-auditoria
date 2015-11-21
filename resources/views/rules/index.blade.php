@@ -112,11 +112,11 @@
                         success: function (data) {
                             console.log(data);
 
-                            var modal = '#result-import-rules';
-                            var aTag = document.createElement('div');
-                            aTag.setAttribute('href', modal);
-                            aTag.setAttribute('rel', 'modal:open');
-                            aTag
+//                            var modal = '#result-import-rules';
+//                            var aTag = document.createElement('div');
+//                            aTag.setAttribute('href', modal);
+//                            aTag.setAttribute('rel', 'modal:open');
+//                            aTag
 
                             new PNotify({
                                 text: 'Priorities successfully changed.',
@@ -195,17 +195,29 @@
                         if (myXhr.upload) { // Avalia se tem suporte a propriedade upload
                             myXhr.upload.addEventListener('progress', function (elem) {
                                 //* faz alguma coisa durante o progresso do upload
-                                console.log(elem);
+                                //console.log(elem);
                             }, false);
                         }
                         return myXhr;
                     },
                     success: function (data) {
-                        console.log(data);
+                        new PNotify({
+                            text: 'File of packages successfully imported.',
+                            styling: "bootstrap3",
+                            icon: '',
+                            type: 'success',
+                            delay: 2000
+                        });
                     },
                     error: function (data) {
-                        console.log(data);
-                    },
+                        new PNotify({
+                            text: data.responseJSON.message,
+                            styling: "bootstrap3",
+                            icon: '',
+                            type: 'error',
+                            delay: 2000
+                        });
+                    }
                 });
             };
 
