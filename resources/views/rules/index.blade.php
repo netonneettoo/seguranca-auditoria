@@ -13,7 +13,7 @@
                     <br style="clear:both;" />
                 </div>
 				<div class="panel-body">
-					<table class="table table-striped table-hover table-condensed">
+					<table class="table table-striped table-hover table-condensed" id="table-rules">
                         <thead>
                             <tr>
                                 <th>Priority</th>
@@ -32,7 +32,7 @@
                         <tbody>
                             @foreach($rules as $rule)
                                 <tr>
-                                    <td>{{$rule->priority}}</td>
+                                    <td class="priority" data-rule-id="{{$rule->id}}">{{$rule->priority}}</td>
                                     <td>{{$rule->name}}</td>
                                     <td>{{$rule->source}}</td>
                                     <td>{{$rule->destination}}</td>
@@ -84,9 +84,50 @@
 @endsection
 
 @section('scripts')
+    <script src="/plugins/row-sorter/RowSorter.js"></script>
     <script>
         $(document).ready(function()
         {
+            $("#table-rules").rowSorter({
+                handler: "td.priority",
+                onDrop: function() {
+                    var rulesArray = [];
+                    $('#table-rules tbody tr').each(function(index, element) {
+                        var tr = $(this).find('td.priority')[0];
+                        $(tr).text((index + 1));
+                        rulesArray.push({
+                            "id": parseInt($(tr).attr('data-rule-id')),
+                            "priority": (index + 1)
+                        });
+                    });
+
+                    $.ajax({
+                        url: '/rules/sortable',
+                        type: 'POST',
+                        data: {'rules' : rulesArray},
+                        cache: false,
+                        success: function (data) {
+                            new PNotify({
+                                text: 'Priorities successfully changed.',
+                                styling: "bootstrap3",
+                                icon: '',
+                                type: 'success',
+                                delay: 2000
+                            });
+                        },
+                        error: function (data) {
+                            new PNotify({
+                                text: 'There was an error changing priorities.',
+                                styling: "bootstrap3",
+                                icon: '',
+                                type: 'error',
+                                delay: 2000
+                            });
+                        }
+                    });
+                }
+            });
+
             $('form[id^=form-delete] button').click(function (evt) {
                 evt.preventDefault();
                 var parent = $(this).parent('form');

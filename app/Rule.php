@@ -33,7 +33,7 @@ class Rule extends Model {
 
     protected $rulesPut = [
         'priority'      => 'between:1,2',
-        'name'          => 'unique:rules|between:1,20',
+        'name'          => 'between:1,20',
         'source'        => 'between:1,15',
         'destination'   => 'between:1,15',
         'direction'     => 'in:in,out',
@@ -90,6 +90,10 @@ class Rule extends Model {
                 $this->rules['destination'] = 'between:1,15|ip';
             }
         }
+        $ruleName = Rule::where('name', $data['name'])->first();
+        if ($ruleName != null && $ruleName->name != $data['name']) {
+            $this->rulesPut['name'] = 'unique:rules|between:1,20';
+        }
         return Validator::make($data, $this->rulesPut, $this->messagesPut);
     }
 
@@ -145,7 +149,7 @@ class Rule extends Model {
     public function getAll()
     {
         $all = [];
-        foreach($this->all() as $data) {
+        foreach($this->orderBy('priority', 'ASC')->get() as $data) {
             $obj = new \stdClass();
             $obj->id            = $data->id;
             $obj->priority      = $data->priority;
@@ -165,7 +169,7 @@ class Rule extends Model {
 
     public function getFind($id)
     {
-        $data = $this->model->find($id);
+        $data = $this->find($id);
         if ($data != null) {
             $obj = new \stdClass();
             $obj->id            = $data->id;

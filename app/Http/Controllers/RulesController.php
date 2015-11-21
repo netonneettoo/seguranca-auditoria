@@ -13,7 +13,7 @@ class RulesController extends Controller {
 
     public function __construct(Rule $model)
     {
-        $this->middleware('auth');
+        //$this->middleware('auth');
         $this->model = $model;
     }
 
@@ -167,69 +167,134 @@ class RulesController extends Controller {
         }
 	}
 
-    public function fieldValidation($fieldName, $fieldValue) {
-        $fieldValidator = Rule::orderBy('priority', 'DESC')->get();
-        foreach($fieldValidator as $obj) {
-            switch ($fieldName) {
-                case 'package_id':
+    private function getObjFromLine($line) {
+        $explode = explode(',', $line);
+        if (count($explode) == 6) {
+            $obj = new \stdClass();
+            $obj->packageId = intval($explode[0]);
+            $obj->source = trim($explode[1]);
+            $obj->destination = trim($explode[2]);
+            $obj->port = intval($explode[3]);
+            $obj->protocol = trim($explode[4]);
+            $obj->content = trim($explode[5]);
+            return $obj;
+        } else {
+            return false;
+        }
+    }
+
+    private function getArrayFromFile($file) {
+        $lines = file($file);
+        $countLines = count($lines);
+        $arrayObj = array();
+        foreach($lines as $line_num => $line) {
+            // não pega a última linha que é o EOF
+            if ($countLines - 1 == $line_num) {
+                if (htmlspecialchars($line) == 'EOF') {
                     break;
-                case 'source':
-                    return 'este campo nao passou pela validacao da regra: ' . $obj->id . '-' . $obj->name;
-                    break;
-                case 'destination':
-                    break;
-                case 'port':
-                    break;
-                case 'protocol':
-                    break;
-                case 'data':
-                    break;
-                default:
-                    //O campo 'tal' não passou na validação da regra de nome 'tal' e id 'tal'
+                }
+            }
+            $objFromLine = $this->getObjFromLine(htmlspecialchars($line));
+            if($objFromLine !== false) {
+                $arrayObj[] = $objFromLine;
+            }
+        };
+        return $arrayObj;
+    }
+
+    private function validateIpRange($ip, $start, $end) {
+        $ipLong = ip2long($ip);
+        $startLong = ip2long($start);
+        $endLong = ip2long($end);
+        echo "ip[{$ip}], start[{$start}], end[{$end}]<br/>";
+        echo "ipLong[{$ipLong}], startLong[{$startLong}], endLong[{$endLong}]<br/>";
+        echo "ip >= start: ".($ipLong >= $startLong)."<br/>";
+        echo "ip <= end: ".($ipLong <= $endLong)."<br/>";
+        echo "<br/>";
+        return $ipLong >= $startLong && $ipLong <= $endLong;
+    }
+
+    private function validatePortRange($port, $start, $end) {
+        if($start === '*') {
+            return true;
+        } else {
+            if($end === '*') {
+                return $port >= $start;
+            } else {
+                return $port >= $start && $port <= $end;
             }
         }
-        return 'ok: ' . $fieldValue;
+    }
+
+    private function validateProtocol($protocol, $protocolRule) {
+        if ($protocolRule === '*') {
+            return true;
+        } else {
+            return $protocol == $protocolRule;
+        }
+    }
+
+    private function validateObj($obj, $rules) {
+        foreach($rules as $rule) {
+            // priority, name, source, destination, direction, protocol, start_port, end_port, action, content,
+
+            if ($rule['direction'] == 'out') {
+                // retorna true, pois nao vai precisar validar o restante dos campos
+                // return true;
+            } else {
+
+                if(!($this->validateIpRange($obj->source, $rule['source'], $rule['destination']) && $this->validateIpRange($obj->destination, $rule['source'], $rule['destination']))) {
+                    // retorna false, pois a validacao deu erro
+                    echo "#{$obj->packageId} [{$rule['name']} = source, destination]" . '<br/>';
+                    return false;
+                }
+
+                if(!$this->validatePortRange($obj->port, $rule['start_port'], $rule['end_port'])) {
+                    // retorna false pois a porta nao esta no range correto
+                    echo "#{$obj->packageId} [{$rule['name']} = port]" . '<br/>';
+                    return false;
+                }
+
+                if(!$this->validateProtocol($obj->protocol, $rule['protocol'])) {
+                    // retorna false, pois o protocolo nao corresponde
+                    echo "#{$obj->packageId} [{$rule['name']} = protocol]" . '<br/>';
+                    return false;
+                }
+
+                if($rule['action'] == 'deny') {
+                    // retorna false, pois se chegar um pacote com essas caracteristicas precisa-se bloquear
+                    echo "#{$obj->packageId} [{$rule['name']} = action]" . '<br/>';
+                    return false;
+                }
+            }
+
+            echo "#{$obj->packageId} - ok" . '<br/>';
+        }
     }
 
     public function import(Request $request)
     {
+        $arrayObj = $this->getArrayFromFile($request->file('file'));
+
+        $rules = Rule::orderBy('priority', 'ASC')->get()->toArray();
+
+        $errors[] = array();
+        foreach($arrayObj as $obj) {
+            $this->validateObj($obj, $rules);
+        }
+    }
+
+    public function sortable(Request $request) {
+
         try {
-            $file = $request->file('file');
-            $regexFilename = '/pacote\d{10}.txt/';
-
-            if (preg_match($regexFilename, $file->getClientOriginalName())) {
-                // success
-            } else {
-                throw new \Exception("O nome do arquivo precisa obedecer ao padrão deste exemplo: 'pacote9999999999.txt'", 422);
+            foreach ($request->get('rules') as $rule) {
+                $r = Rule::find($rule['id']);
+                $r->priority = $rule['priority'];
+                $r->save();
             }
-
-            $lines = explode(PHP_EOL, file_get_contents($file->getRealPath()));
-
-            $return = [];
-            foreach($lines as $line) {
-                $fields = explode(',', $line);
-                if ($fields[0] == 'EOF') {
-                    break;
-                }
-                $newArray['errors'] = array();
-
-                $newArray['package_id'] = $fields[0];
-                //$newArray['errors'][] = $this->fieldValidation('package_id', $newArray['package_id']);
-
-                $newArray['source'] = $fields[1];
-                //$newArray['errors'][] = $this->fieldValidation('source', $newArray['source']);
-
-                $newArray['destination'] = $fields[2];
-                $newArray['port'] = $fields[3];
-                $newArray['protocol'] = $fields[4];
-                $newArray['data'] = $fields[5];
-                $return[] = $newArray;
-            }
-
-            return response()->json(array('code' => 200, 'message' => 'sucesso', 'data' => $return));
-
+            return response()->json($request->all(), 200);
         } catch (\Exception $e) {
-            return response()->json(array('code' => $e->getCode(), 'message' => $e->getMessage()));
+            return response()->json($request->all(), 500);
         }
     }
 }
