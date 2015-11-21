@@ -80,6 +80,9 @@
 			</div>
 		</div>
 	</div>
+
+    <!-- Modal HTML embedded directly into document -->
+    <div id="result-import-rules" style="display:none;"></div>
 </div>
 @endsection
 
@@ -107,6 +110,14 @@
                         data: {'rules' : rulesArray},
                         cache: false,
                         success: function (data) {
+                            console.log(data);
+
+                            var modal = '#result-import-rules';
+                            var aTag = document.createElement('div');
+                            aTag.setAttribute('href', modal);
+                            aTag.setAttribute('rel', 'modal:open');
+                            aTag
+
                             new PNotify({
                                 text: 'Priorities successfully changed.',
                                 styling: "bootstrap3",

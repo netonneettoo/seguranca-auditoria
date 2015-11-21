@@ -15,6 +15,7 @@
 	<link rel="stylesheet" href="/plugins/bootstrap/css/bootstrap-theme.min.css">
 
 	<link href="/plugins/pnotify/pnotify.custom.min.css" media="all" rel="stylesheet" type="text/css" />
+	<link href="/plugins/jquery-modal/jquery-modal.css" media="all" rel="stylesheet" type="text/css" />
 
 	<link href="/css/app.css" rel="stylesheet">
 
@@ -70,6 +71,7 @@
 	<script src="/plugins/jquery-validate/additional-methods.min.js"></script>
 
 	<script type="text/javascript" src="/plugins/pnotify/pnotify.custom.min.js"></script>
+	<script type="text/javascript" src="/plugins/jquery-modal/jquery-modal.min.js"></script>
 
 	<script>
 		$(document).ready(function() {

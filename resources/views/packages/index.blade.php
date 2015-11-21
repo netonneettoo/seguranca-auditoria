@@ -56,13 +56,13 @@
 				</div>
                 <div class="panel-footer">
                     <div class="pull-right">
-                        <form id="form-import" style="display:inline;">
-                            <input id="token_import" type="hidden" name="_token" value="{{ csrf_token() }}">
-                            <input id="file-import" type="file" name="file" accept="text/plain" style="display:none;" />
-                            <button class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Import TXT">
-                                <span class="glyphicon glyphicon-import" aria-hidden="true"></span>
-                            </button>
-                        </form>
+                        {{--<form id="form-import" style="display:inline;">--}}
+                            {{--<input id="token_import" type="hidden" name="_token" value="{{ csrf_token() }}">--}}
+                            {{--<input id="file-import" type="file" name="file" accept="text/plain" style="display:none;" />--}}
+                            {{--<button class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Import TXT">--}}
+                                {{--<span class="glyphicon glyphicon-import" aria-hidden="true"></span>--}}
+                            {{--</button>--}}
+                        {{--</form>--}}
                         <a href="/packages/export" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Export to TXT">
                             <span class="glyphicon glyphicon-export" aria-hidden="true"></span>
                         </a>

@@ -188,7 +188,7 @@ class RulesController extends Controller {
         $countLines = count($lines);
         $arrayObj = array();
         foreach($lines as $line_num => $line) {
-            // n�o pega a �ltima linha que � o EOF
+            // não pega a última linha que é o EOF
             if ($countLines - 1 == $line_num) {
                 if (htmlspecialchars($line) == 'EOF') {
                     break;
@@ -201,17 +201,17 @@ class RulesController extends Controller {
         };
         return $arrayObj;
     }
+    
+    private function validateIpRangeSource($ip, $min) {
+        $ipLong = intval(str_replace('.', '', $ip));//ip2long($ip);
+        $minLong = intval(str_replace('.', '', $min));//ip2long($min);
+        return boolval($ipLong >= $minLong);
+    }
 
-    private function validateIpRange($ip, $start, $end) {
+    private function validateIpRangeDestination($ip, $max) {
         $ipLong = ip2long($ip);
-        $startLong = ip2long($start);
-        $endLong = ip2long($end);
-        echo "ip[{$ip}], start[{$start}], end[{$end}]<br/>";
-        echo "ipLong[{$ipLong}], startLong[{$startLong}], endLong[{$endLong}]<br/>";
-        echo "ip >= start: ".($ipLong >= $startLong)."<br/>";
-        echo "ip <= end: ".($ipLong <= $endLong)."<br/>";
-        echo "<br/>";
-        return $ipLong >= $startLong && $ipLong <= $endLong;
+        $maxLong = ip2long($max);
+        return boolval($ipLong <= $maxLong);
     }
 
     private function validatePortRange($port, $start, $end) {
@@ -221,7 +221,7 @@ class RulesController extends Controller {
             if($end === '*') {
                 return $port >= $start;
             } else {
-                return $port >= $start && $port <= $end;
+                return (($port >= $start) && ($port <= $end));
             }
         }
     }
@@ -238,49 +238,66 @@ class RulesController extends Controller {
         foreach($rules as $rule) {
             // priority, name, source, destination, direction, protocol, start_port, end_port, action, content,
 
+            $objReturn = new \stdClass();
+            $objReturn->fail = false;
+            $objReturn->package = $obj;
+            $objReturn->messages = array();
+
             if ($rule['direction'] == 'out') {
                 // retorna true, pois nao vai precisar validar o restante dos campos
-                // return true;
+                $objReturn->messages[] = "PackageId: #{$obj->packageId}, RuleName: #{$rule['name']} - Regra de saída, sem necessidade de validar.";
+                $objReturn->fail = false;
             } else {
 
-                if(!($this->validateIpRange($obj->source, $rule['source'], $rule['destination']) && $this->validateIpRange($obj->destination, $rule['source'], $rule['destination']))) {
+                if(!($this->validateIpRangeSource($obj->source, $rule['source']))) {
                     // retorna false, pois a validacao deu erro
-                    echo "#{$obj->packageId} [{$rule['name']} = source, destination]" . '<br/>';
-                    return false;
+                    $objReturn->fail = true;
+                    $objReturn->messages[] = "PackageId: #{$obj->packageId}, RuleName: #{$rule['name']} - O ip de origem ({$obj->source}) está fora do range ({$rule['source']}, {$rule['destination']}).";
+                }
+
+                if(!($this->validateIpRangeDestination($obj->destination, $rule['destination']))) {
+                    // retorna false, pois a validacao deu erro
+                    $objReturn->fail = true;
+                    $objReturn->messages[] = "PackageId: #{$obj->packageId}, RuleName: #{$rule['name']} - O ip de destino ({$obj->destination}) está fora do range ({$rule['source']}, {$rule['destination']}).";
                 }
 
                 if(!$this->validatePortRange($obj->port, $rule['start_port'], $rule['end_port'])) {
                     // retorna false pois a porta nao esta no range correto
-                    echo "#{$obj->packageId} [{$rule['name']} = port]" . '<br/>';
-                    return false;
+                    $objReturn->fail = true;
+                    $objReturn->messages[] = "PackageId: #{$obj->packageId}, Rule: #{$rule['name']} - A porta ({$obj->port}) está fora do range ({$rule['start_port']}, {$rule['end_port']}).";
                 }
 
                 if(!$this->validateProtocol($obj->protocol, $rule['protocol'])) {
                     // retorna false, pois o protocolo nao corresponde
-                    echo "#{$obj->packageId} [{$rule['name']} = protocol]" . '<br/>';
-                    return false;
+                    $objReturn->fail = true;
+                    $objReturn->messages[] = "PackageId: #{$obj->packageId}, Rule: #{$rule['name']} - O protocolo ({$obj->port}) é inválido.";
                 }
 
                 if($rule['action'] == 'deny') {
                     // retorna false, pois se chegar um pacote com essas caracteristicas precisa-se bloquear
-                    echo "#{$obj->packageId} [{$rule['name']} = action]" . '<br/>';
-                    return false;
+                    $objReturn->fail = true;
+                    $objReturn->messages[] = "#{$obj->packageId} [{$rule['name']} = action]" . '<br/>';
                 }
             }
 
-            echo "#{$obj->packageId} - ok" . '<br/>';
+            return $objReturn;
         }
     }
 
     public function import(Request $request)
     {
-        $arrayObj = $this->getArrayFromFile($request->file('file'));
+        try {
+            $arrayObj = $this->getArrayFromFile($request->file('file'));
+            $rules = Rule::orderBy('priority', 'ASC')->get()->toArray();
 
-        $rules = Rule::orderBy('priority', 'ASC')->get()->toArray();
-
-        $errors[] = array();
-        foreach($arrayObj as $obj) {
-            $this->validateObj($obj, $rules);
+            // é necessário que se faça uma transaçao do banco...
+            $return = array();
+            foreach($arrayObj as $obj) {
+                $return[] = $this->validateObj($obj, $rules);
+            }
+            return response()->json($return, 200);
+        } catch (\Exception $e) {
+            return response()->json([$e->getMessage()], 500);
         }
     }
 
