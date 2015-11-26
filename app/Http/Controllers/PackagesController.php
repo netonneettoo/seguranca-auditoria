@@ -170,30 +170,52 @@ class PackagesController extends Controller {
 
 	public function import(Request $request)
 	{
-		$file = $request->file('file');
-		$regexFilename = '/pacote\d{10}.txt/';
+        try {
+            $file = $_FILES['file'];
+            $regexFilename = '/pacote\d{10}.txt/';
 
-		if (preg_match($regexFilename, $file->getClientOriginalName())) {
-			//dd('success');
-		} else {
-			//dd("Nome do arquivo precisa obedecer ao padrão deste exemplo: 'pacote9999999999.txt'");
-		}
+            if (preg_match($regexFilename, $file['name'])) {
 
-		$lines = explode(PHP_EOL, File::get($file->getRealPath()));
 
-		$return = [];
-		foreach($lines as $line) {
-			$fields = explode(',', $line);
-			$newArray['package_id'] = $fields[0];
-			$newArray['source'] = $fields[1];
-			$newArray['destination'] = $fields[2];
-			$newArray['port'] = $fields[3];
-			$newArray['protocol'] = $fields[4];
-			$newArray['data'] = $fields[5];
-			$return[] = $newArray;
-		}
+                $arrayObj = $this->getArrayFromFile($file['tmp_name']);
 
-		dd($return);
+
+
+                return response()->json($arrayObj, 200);
+
+            } else {
+                throw new \Exception('O nome do arquivo é inválido. Ex: pacote2012207180.txt', 500);
+            }
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+
+
+//		$file = $request->file('file');
+//		$regexFilename = '/pacote\d{10}.txt/';
+//
+//		if (preg_match($regexFilename, $file->getClientOriginalName())) {
+//			//dd('success');
+//		} else {
+//			//dd("Nome do arquivo precisa obedecer ao padrão deste exemplo: 'pacote9999999999.txt'");
+//		}
+//
+//		$lines = explode(PHP_EOL, File::get($file->getRealPath()));
+//
+//		$return = [];
+//		foreach($lines as $line) {
+//			$fields = explode(',', $line);
+//			$newArray['package_id'] = $fields[0];
+//			$newArray['source'] = $fields[1];
+//			$newArray['destination'] = $fields[2];
+//			$newArray['port'] = $fields[3];
+//			$newArray['protocol'] = $fields[4];
+//			$newArray['data'] = $fields[5];
+//			$return[] = $newArray;
+//		}
+//
+//		dd($return);
 	}
 
 	public function export()
@@ -205,6 +227,7 @@ class PackagesController extends Controller {
 		if ($fopen) {
 			$separator = ',';
 			$return = [];
+            $return[] = count($packages);
 			foreach($packages as $package) {
 				$return[] =
 					Crypt::decrypt($package->package_id).$separator.

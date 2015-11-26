@@ -67,8 +67,8 @@
                         <form id="form-import" style="display:inline;">
                             <input id="token_import" type="hidden" name="_token" value="{{ csrf_token() }}">
                             <input id="file-import" type="file" name="file" accept="text/plain" style="display:none;" />
-                            <button class="btn btn-default" data-toggle="tooltip" data-placement="left" title="To Validate TXT">
-                                <span class="glyphicon glyphicon-import" aria-hidden="true"></span>
+                            <button class="btn btn-xs btn-primary">
+                                <span class="glyphicon glyphicon-import" aria-hidden="true"></span> Validate File
                             </button>
                         </form>
                         {{--<a href="/packages/export" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Export to TXT">--}}

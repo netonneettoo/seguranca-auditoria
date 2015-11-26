@@ -189,6 +189,10 @@ class RulesController extends Controller {
         $countLines = count($lines);
         $arrayObj = array();
         foreach($lines as $line_num => $line) {
+            // fazendo verificação da primeira linha, pra não levar em consideração a contagem dos registros
+            if ($line_num == 0) {
+                continue;
+            }
             // não pega a última linha que é o EOF
             if ($countLines - 1 == $line_num) {
                 if (htmlspecialchars($line) == 'EOF') {
@@ -277,9 +281,11 @@ class RulesController extends Controller {
                 if($rule['action'] == 'deny') {
                     if(!$objReturn->fail) {
                         // retorna false, pois se chegar um pacote com essas caracteristicas precisa-se bloquear
-                        $objReturn->fail = true;
+                        $obj->is_deny = true;
                         $objReturn->messages[] = "#{$obj->package_id} [{$rule['name']} = action]" . '<br/>';
                     }
+                } else {
+                    $obj->is_deny = false;
                 }
             }
 
@@ -312,8 +318,10 @@ class RulesController extends Controller {
                 \DB::beginTransaction();
                 foreach ($return as $obj) {
                     if (!$obj->fail) { // se não tiver corrido erro
-                        $importedPackage = (new ImportedPackage())->fill((array)$obj->package);
-                        $importedPackage->save();
+                        if (! $obj->package->is_deny) {
+                            $importedPackage = (new ImportedPackage())->fill((array)$obj->package);
+                            $importedPackage->save();
+                        }
                     } else {
                         \DB::rollBack();
                     }
