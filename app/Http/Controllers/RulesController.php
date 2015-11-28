@@ -305,23 +305,6 @@ class RulesController extends Controller {
                         $return[$k] = 'Este pacote não se encaixou em nenhuma regra';
                 }
 
-                //dd($return);
-
-                /*test
-                \DB::beginTransaction();
-                foreach ($return as $obj) {
-                    if (!$obj->fail) { // se não tiver corrido erro
-                        if (! $obj->package->is_deny) {
-                            $importedPackage = (new ImportedPackage())->fill((array)$obj->package);
-                            $importedPackage->save();
-                        }
-                    } else {
-                        \DB::rollBack();
-                    }
-                }
-                \DB::commit();
-                //test*/
-
                 return response()->json($return, 200);
 
             } else {
