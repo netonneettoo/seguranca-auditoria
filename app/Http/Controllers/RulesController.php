@@ -208,32 +208,21 @@ class RulesController extends Controller {
         return $arrayObj;
     }
 
-    private function validateIp($ip, $ruleIp) {
-        if ($ruleIp == '*') {
+    private function validateIp($ip, $ipRule) {
+        if ($ipRule == '*') {
             return true;
         } else {
-            return $ip == $ruleIp;
+            return $ip == $ipRule;
         }
     }
 
-    private function validateIpRangeSource($ip, $min) {
-        $ipLong = intval(str_replace('.', '', $ip));//ip2long($ip);
-        $minLong = intval(str_replace('.', '', $min));//ip2long($min);
-        return boolval($ipLong >= $minLong);
-    }
-
-    private function validateIpRangeDestination($ip, $max) {
-        $ipLong = ip2long($ip);
-        $maxLong = ip2long($max);
-        return boolval($ipLong <= $maxLong);
-    }
-
-    private function validatePortRange($port, $start, $end) {
+    private function validatePortRange($port, $start, $end, $obj) {
         if($start === '*') {
             return true;
         } else {
-            if($end === '*') {
-                return boolval($port >= $start);
+            if($end === '*' || empty($end)) {
+                //echo $obj->package_id.' '.$port . '<- port, start->('.$start.') end->' . $end . '('.boolval($port >= $start).')('.boolval($port <= 65535).')<br/>';
+                return boolval(($port >= $start) && ($port <= 65535));
             } else {
                 return boolval(($port >= $start) && ($port <= $end));
             }
@@ -241,68 +230,54 @@ class RulesController extends Controller {
     }
 
     private function validateProtocol($protocol, $protocolRule) {
-        if ($protocolRule === '*') {
+        if ($protocolRule === '*' || empty($protocolRule)) {
             return true;
         } else {
             return $protocol == $protocolRule;
         }
     }
 
+    private function validateAction($action) {
+        if ($action == 'allow')
+            return true;
+        else
+            return false;
+    }
+
     private function validateObj($obj, $rules) {
         foreach($rules as $rule) {
             // priority, name, source, destination, direction, protocol, start_port, end_port, action, content,
 
-            $objReturn = new \stdClass();
-            $objReturn->fail = false;
-            $objReturn->package = $obj;
-            $objReturn->messages = array();
-
             if ($rule['direction'] == 'out') {
-                // retorna true, pois nao vai precisar validar o restante dos campos
-                $objReturn->messages[] = "PackageId: #{$obj->package_id}, RuleName: #{$rule['name']} - Regra de saída, sem necessidade de validar.";
-                $objReturn->fail = false;
+                return "PackageId: #{$obj->package_id}, RuleName: #{$rule['name']} - Regra de saída, sem necessidade de validar.";
             } else {
-
-                if(!($this->validateIp($obj->source, $rule['source']))) {
-                    // retorna false, pois a validacao deu erro
-                    $objReturn->fail = true;
-                    $objReturn->messages[] = "PackageId: #{$obj->package_id}, RuleName: #{$rule['name']} - O ip de origem ({$obj->source}) não corresponde à ({$rule['source']}}).";
-                }
-
-                if(!($this->validateIp($obj->destination, $rule['destination']))) {
-                    // retorna false, pois a validacao deu erro
-                    $objReturn->fail = true;
-                    $objReturn->messages[] = "PackageId: #{$obj->package_id}, RuleName: #{$rule['name']} - O ip de destino ({$obj->destination}) não corresponde à ({$rule['destination']}).";
-                }
-
-                if(!$this->validatePortRange($obj->port, $rule['start_port'], $rule['end_port'])) {
-                    // retorna false pois a porta nao esta no range correto
-                    $objReturn->fail = true;
-                    $objReturn->messages[] = "PackageId: #{$obj->package_id}, Rule: #{$rule['name']} - A porta ({$obj->port}) está fora do range ({$rule['start_port']}, {$rule['end_port']}).";
-                }
-
-                if(!$this->validateProtocol($obj->protocol, $rule['protocol'])) {
-                    // retorna false, pois o protocolo nao corresponde
-                    $objReturn->fail = true;
-                    $objReturn->messages[] = "PackageId: #{$obj->package_id}, Rule: #{$rule['name']} - O protocolo ({$obj->port}) é inválido.";
-                }
-
-                if($rule['action'] == 'deny') {
-                    if(!$objReturn->fail) {
-                        // retorna false, pois se chegar um pacote com essas caracteristicas precisa-se bloquear
-                        $obj->is_deny = true;
-                        $objReturn->messages[] = "#{$obj->package_id} [{$rule['name']} = action]" . '<br/>';
+                //
+                if($this->validateIp($obj->source, $rule['source'])) {
+                    //
+                    //echo $obj->package_id . '-' .  $rule['name'] . ' = validateIp-source: true <br/>';
+                    if($this->validateIp($obj->destination, $rule['destination'])) {
+                        //
+                        //echo $obj->package_id . '-' .  $rule['name'] . ' = validateIp-destination: true <br/>';
+                        if($this->validatePortRange($obj->port, $rule['start_port'], $rule['end_port'], $obj)) {
+                            //
+                            //echo $obj->package_id . '-' .  $rule['name'] . ' = validatePortRange: true <br/>';
+                            if($this->validateProtocol($obj->protocol, $rule['protocol'])) {
+                                //
+                                //echo $obj->package_id . '-' .  $rule['name'] . ' = validateProtocol: true <br/>';
+                                if($this->validateAction($rule['action'])) {
+                                    // save the package...
+                                    return "O pacote #{$obj->package_id} se encaixou na regra: <b>".strtoupper($rule['name'])."</b>. Este pacote pode ser salvo no banco.";
+                                } else {
+                                    // blocked and not save the package
+                                    return "O pacote #{$obj->package_id} foi bloqueado pela regra: <b>".strtoupper($rule['name'])."</b>.";
+                                }
+                            }
+                        }
                     }
-                } else {
-                    $obj->is_deny = false;
                 }
             }
 
-            if (!$obj->is_deny) {
-                $objReturn->messages[] = "#{$obj->package_id} passou pela regra: [{$rule['name']}]" . '<br/>';
-            }
-
-            return $objReturn;
+            //return "PackageId: #{$obj->package_id} - Este pacote não se encaixou em nenhuma regra.";
         }
     }
 
@@ -325,9 +300,14 @@ class RulesController extends Controller {
                     $return[] = $this->validateObj($obj, $rules);
                 }
 
-                dd($return);
+                foreach($return as $k => $v) {
+                    if (is_null($v))
+                        $return[$k] = 'Este pacote não se encaixou em nenhuma regra';
+                }
 
-                //test
+                //dd($return);
+
+                /*test
                 \DB::beginTransaction();
                 foreach ($return as $obj) {
                     if (!$obj->fail) { // se não tiver corrido erro
@@ -340,7 +320,7 @@ class RulesController extends Controller {
                     }
                 }
                 \DB::commit();
-                //test
+                //test*/
 
                 return response()->json($return, 200);
 
