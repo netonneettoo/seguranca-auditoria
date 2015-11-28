@@ -65,7 +65,7 @@
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="/plugins/bootstrap/js/bootstrap.min.js"></script>
 
-	<script src="http://igorescobar.github.io/jQuery-Mask-Plugin/js/jquery.mask.min.js"></script>
+	<script src="/plugins/jquery-mask/jquery-mask.min.js"></script>
 
 	<script src="/plugins/jquery-validate/jquery.validate.min.js"></script>
 	<script src="/plugins/jquery-validate/localization/messages_pt_BR.min.js"></script>
