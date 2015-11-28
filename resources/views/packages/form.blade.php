@@ -66,7 +66,7 @@
                     port: {
                         required: true,
                         number: true,
-                        range: [1, 9999]
+                        range: [1, 65535]
                     },
                     protocol: {
                         required: true,

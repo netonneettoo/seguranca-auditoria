@@ -21,7 +21,7 @@ class Package extends Model {
 		'package_id' 	=> 'required|integer|between:1,9999',
 		'source' 		=> 'required|between:7,15',
 		'destination' 	=> 'required|between:7,15',
-		'port' 			=> 'required|integer|between:1,9999',
+		'port' 			=> 'required|integer|between:1,65535',
 		'protocol' 		=> 'required|in:tcp,udp,icmp',
 		'data' 			=> 'required|between:1,50'
 	];
@@ -30,7 +30,7 @@ class Package extends Model {
 		'package_id' 	=> 'integer|between:1,9999',
 		'source' 		=> 'between:7,15',
 		'destination' 	=> 'between:7,15',
-		'port' 			=> 'integer|between:1,9999',
+		'port' 			=> 'integer|between:1,65535',
 		'protocol' 		=> 'in:tcp,udp,icmp',
 		'data' 			=> 'between:1,50'
 	];

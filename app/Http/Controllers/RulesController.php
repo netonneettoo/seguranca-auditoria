@@ -178,6 +178,7 @@ class RulesController extends Controller {
             $obj->port = intval($explode[3]);
             $obj->protocol = trim($explode[4]);
             $obj->data = trim($explode[5]);
+//            dd($obj);
             return $obj;
         } else {
             return false;
@@ -205,6 +206,14 @@ class RulesController extends Controller {
             }
         };
         return $arrayObj;
+    }
+
+    private function validateIp($ip, $ruleIp) {
+        if ($ruleIp == '*') {
+            return true;
+        } else {
+            return $ip == $ruleIp;
+        }
     }
 
     private function validateIpRangeSource($ip, $min) {
@@ -254,16 +263,16 @@ class RulesController extends Controller {
                 $objReturn->fail = false;
             } else {
 
-                if(!($this->validateIpRangeSource($obj->source, $rule['source']))) {
+                if(!($this->validateIp($obj->source, $rule['source']))) {
                     // retorna false, pois a validacao deu erro
                     $objReturn->fail = true;
-                    $objReturn->messages[] = "PackageId: #{$obj->package_id}, RuleName: #{$rule['name']} - O ip de origem ({$obj->source}) está fora do range ({$rule['source']}, {$rule['destination']}).";
+                    $objReturn->messages[] = "PackageId: #{$obj->package_id}, RuleName: #{$rule['name']} - O ip de origem ({$obj->source}) não corresponde à ({$rule['source']}}).";
                 }
 
-                if(!($this->validateIpRangeDestination($obj->destination, $rule['destination']))) {
+                if(!($this->validateIp($obj->destination, $rule['destination']))) {
                     // retorna false, pois a validacao deu erro
                     $objReturn->fail = true;
-                    $objReturn->messages[] = "PackageId: #{$obj->package_id}, RuleName: #{$rule['name']} - O ip de destino ({$obj->destination}) está fora do range ({$rule['source']}, {$rule['destination']}).";
+                    $objReturn->messages[] = "PackageId: #{$obj->package_id}, RuleName: #{$rule['name']} - O ip de destino ({$obj->destination}) não corresponde à ({$rule['destination']}).";
                 }
 
                 if(!$this->validatePortRange($obj->port, $rule['start_port'], $rule['end_port'])) {
@@ -289,6 +298,10 @@ class RulesController extends Controller {
                 }
             }
 
+            if (!$obj->is_deny) {
+                $objReturn->messages[] = "#{$obj->package_id} passou pela regra: [{$rule['name']}]" . '<br/>';
+            }
+
             return $objReturn;
         }
     }
@@ -312,7 +325,7 @@ class RulesController extends Controller {
                     $return[] = $this->validateObj($obj, $rules);
                 }
 
-                //dd($return);
+                dd($return);
 
                 //test
                 \DB::beginTransaction();

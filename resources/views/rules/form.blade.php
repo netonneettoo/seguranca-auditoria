@@ -5,7 +5,7 @@
 </div>
 <div class="form-group">
     <label for="priority">Priority</label>
-    <input class="form-control" type="text" id="priority" name="priority" maxlength="2"/>
+    <input class="form-control" type="number" step="1" min="1" max="99" id="priority" name="priority" maxlength="2"/>
 </div>
 <div class="form-group">
     <label for="name">Name</label>
@@ -127,7 +127,7 @@
                         required: true,
                         minlength: 1,
                         maxlenght: 30
-                    },
+                    }
                 }
             });
 
@@ -165,7 +165,7 @@
                         required: true,
                         minlength: 1,
                         maxlenght: 30
-                    },
+                    }
                 }
             });
 
@@ -181,6 +181,8 @@
                     });
                 }
             }, 500);
+
+            //$('#priority').mask('99');
 
             /*$('#package_id').mask('9999');
 

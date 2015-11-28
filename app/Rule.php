@@ -41,7 +41,7 @@ class Rule extends Model {
         'start_port'    => 'between:1,5',
         'end_port'      => 'between:1,5',
         'action'        => 'in:allow,deny',
-        //'content'       => 'between:1,30',
+        'content'       => 'between:1,30',
     ];
 
     const DIRECTION_IN = 'in';

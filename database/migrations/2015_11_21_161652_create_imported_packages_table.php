@@ -16,11 +16,11 @@ class CreateImportedPackagesTable extends Migration {
 		{
 			$table->increments('id');
 
+            $table->text('package_id');
             $table->text('source');
             $table->text('destination');
             $table->text('port');
             $table->text('protocol');
-            $table->text('package_id');
             $table->text('data');
 
 			$table->timestamps();
