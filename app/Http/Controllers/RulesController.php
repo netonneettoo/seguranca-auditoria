@@ -249,7 +249,7 @@ class RulesController extends Controller {
             // priority, name, source, destination, direction, protocol, start_port, end_port, action, content,
 
             if ($rule['direction'] == 'out') {
-                return "PackageId: #{$obj->package_id}, RuleName: #{$rule['name']} - Regra de saída, sem necessidade de validar.";
+                return "PackageId: #{$obj->package_id}, RuleName: #{$rule['name']} - Regra de saída, sem necessidade de validar.<br/>";
             } else {
                 //
                 if($this->validateIp($obj->source, $rule['source'])) {
@@ -266,10 +266,10 @@ class RulesController extends Controller {
                                 //echo $obj->package_id . '-' .  $rule['name'] . ' = validateProtocol: true <br/>';
                                 if($this->validateAction($rule['action'])) {
                                     // save the package...
-                                    return "O pacote #{$obj->package_id} se encaixou na regra: <b>".strtoupper($rule['name'])."</b>. Este pacote pode ser salvo no banco.";
+                                    return "O pacote <b>#{$obj->package_id}</b> se encaixou na regra: <b>".strtoupper($rule['name'])."</b><br/>";
                                 } else {
                                     // blocked and not save the package
-                                    return "O pacote #{$obj->package_id} foi bloqueado pela regra: <b>".strtoupper($rule['name'])."</b>.";
+                                    return "O pacote <b>#{$obj->package_id}</b> foi bloqueado pela regra: <b>".strtoupper($rule['name'])."</b><br/>";
                                 }
                             }
                         }

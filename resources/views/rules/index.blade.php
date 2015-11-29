@@ -3,6 +3,17 @@
 @section('content')
 <div class="container">
 	<div class="row">
+
+        <div class="col-md-12" id="result-imported-file" style="display:none;">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Resultado da validação do arquivo com os pacotes.
+                    <span class="glyphicon glyphicon-remove pull-right close-result" style="cursor:pointer;" aria-hidden="true"></span>
+                </div>
+                <div class="panel-body"></div>
+            </div>
+        </div>
+
 		<div class="col-md-12">
             <div class="panel panel-default">
 				<div class="panel-heading">
@@ -110,14 +121,6 @@
                         data: {'rules' : rulesArray},
                         cache: false,
                         success: function (data) {
-                            console.log(data);
-
-//                            var modal = '#result-import-rules';
-//                            var aTag = document.createElement('div');
-//                            aTag.setAttribute('href', modal);
-//                            aTag.setAttribute('rel', 'modal:open');
-//                            aTag
-
                             new PNotify({
                                 text: 'Priorities successfully changed.',
                                 styling: "bootstrap3",
@@ -201,6 +204,7 @@
                         return myXhr;
                     },
                     success: function (data) {
+                        openResult(data);
                         new PNotify({
                             text: 'File of packages successfully imported.',
                             styling: "bootstrap3",
@@ -219,6 +223,7 @@
                         });
                     }
                 });
+                clearInputFile();
             };
 
             $('#form-import').submit(function(evt) {
@@ -228,6 +233,34 @@
 
             $('#file-import').change(function(event) {
                 sendFile(event.target.files[0]);
+            });
+
+            var clearInputFile = function() {
+                $('#file-import').attr('value', '');
+            };
+
+            var $result = $('#result-imported-file');
+            var $closeResult = $('.close-result');
+
+            var openResult = function(data) {
+                if ($result.css('display') == 'block') {
+                    closeResult();
+                }
+                $result.find('.panel-body').html('');
+                $result.show('slow', function() {
+                    for(var i = 0; i < data.length; i++) {
+                        $result.find('.panel-body').append(data[i]);
+                    }
+                });
+            };
+
+            var closeResult = function() {
+                $result.hide('fast');
+            };
+
+            $closeResult.click(function(e) {
+                e.preventDefault();
+                closeResult();
             });
         });
     </script>

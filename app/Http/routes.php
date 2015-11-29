@@ -22,9 +22,3 @@ Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',
 ]);
-
-Route::get('/test', function() {
-
-    return \App\ImportedPackage::all();
-
-});
